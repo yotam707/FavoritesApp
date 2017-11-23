@@ -1,0 +1,44 @@
+<div class="container mt-6">
+    <div class="row">
+            <div class="col-md-2">
+                    
+            </div>
+            <div class="col-md-8">
+                <div class="acion-log-section row form-inline mb-md-5">
+                    <div class="col-md-10 form-group">
+                        <input  [(ngModel)]="searchText" class="form-control form-control-wide mr-sm-2" type="text"  placeholder="Filter by website name or URL" aria-label="Search">
+                        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit"> <i  class="fa fa-search"></i></button>
+                    </div>
+                    <div class="col-md-2">
+
+                    </div>
+                </div>
+                
+                <div class="action-log-table" *ngIf="logsList">
+                    <table class="table table-hover">
+                    <thead class="h">
+                        <tr class="h">
+                        <th>Date / Time</th>
+                        <th>Action</th>
+                        <th>Website name</th>
+                        <th>URL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="logs" *ngFor="let log of logsList | searchFilter : { websiteName : searchText , websiteURL: searchText } : false">
+                        <ng-container>
+                            <td>{{log.date | dateTimeFormat}}</td>
+                            <td>{{log.action}}</td>
+                            <td>{{log.websiteName}}</td>
+                            <td>{{(log.websiteURL)? (log.websiteURL | slice:0:15)+'...':(log.websiteURL)}}</td>
+                        </ng-container>
+                        </tr>
+                    </tbody>
+                    </table>
+                </div>          
+                
+            </div>
+            <div class="col-md-2">  
+            </div>
+    </div>
+</div>

@@ -1,0 +1,174 @@
+<div class="container mt-6">
+    <div class="row">
+      <div class="col-md-2">
+      
+      </div>
+      <div class="col-md-8">
+        <div class="top-favorite-section row form-inline mb-md-5">
+              <div class="col-md-10 form-group">
+                  <input  [(ngModel)]="searchText" class="form-control form-control-wide mr-sm-2" type="text"  placeholder="Filter by website name or URL" aria-label="Search">
+                  <button class="btn btn-outline-primary my-2 my-sm-0" type="submit"> <i  class="fa fa-search"></i></button>
+              </div>
+               <div class="col-md-2">
+                  <div class="btn-group" role="group">
+                      <button *ngIf="isGrid" class="btn btn-outline-primary my-2 my-sm-0" (click)="changeIsGrid()"><i class="fa fa-th-large" aria-hidden="true"></i></button>
+                      <button *ngIf="!isGrid" class="btn btn-outline-primary my-2 my-sm-0" (click)="changeIsGrid()"><i class="fa fa-th-list" aria-hidden="true"></i></button>
+                      <button class="btn btn-primary my-2 my-sm-0" (click)="open(content)">Add</button>
+                  </div>
+               </div>
+        </div>
+        
+      <div class="favorites-table" *ngIf="favoritesList && !isGrid">
+            <table class="table table-hover">
+              <thead class="h">
+                <tr class="h">
+                  <th>Website name</th>
+                  <th>Website URL</th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="favorite" (dblclick)="editFavorite(favorite)" *ngFor="let favorite of favoritesList | searchFilter : { websiteName : searchText , websiteURL: searchText } : false; let i = index">
+    
+                  <ng-container *ngIf="!editFavorites.includes(favorite);else editFV">
+                    <td>{{favorite.websiteName}}</td>
+                    <td>{{favorite.websiteURL}}</td>
+                    <td>
+                      <button class="btn btn-primary" (click)="editFavorite(favorite)" ngbTooltip="Edit">
+                          <i  class="fa fa-pencil"></i>
+                        </button>
+                    </td>
+                    <td>
+                      <button class="btn btn-danger" (click)="openDelete(favorite, delete)" ngbTooltip="Delete">
+                          <i  class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                  </ng-container>
+                  <ng-template #editFV>
+                      <td>
+                        <input type="text" name="websiteName" id="websiteName" (keypress)="submitFavorite($event, favorite)" [(ngModel)]="favorite.websiteName" placeholder="WebsiteName" class="form-control">
+                      </td>
+                      <td><input type="text" name="WebsiteURL" type="url" id="WebsiteURL" (keypress)="submitFavorite($event, favorite)" [(ngModel)]="favorite.websiteURL" placeholder="WebsiteURL" class="form-control">
+                      </td>
+                      <td>
+                          <button class="btn btn-success" (click)="editFavorite(favorite)">Save</button>
+                      </td>
+                      <td>
+                          <button class="btn btn-primary" (click)="cancelEditFavorite()">Cancel</button>
+                      </td>
+                  </ng-template>
+                    
+                </tr>
+              </tbody>
+            </table>
+        </div>          
+       
+      </div>
+    
+      <div class="favorites-tiles container center" *ngIf="favoritesList && isGrid">
+        <div class="card-columns">
+            <div class="card text-center" *ngFor="let favorite of favoritesList | searchFilter : { websiteName : searchText , websiteURL: searchText } : false">
+                <ng-container *ngIf="!editFavorites.includes(favorite);else editFV">
+                    <img class="card-img-top card-image mt-3" src="https://compass-ssl.microsoft.com/assets/bc/84/bc84e95b-76b9-4b24-ad5f-9748a2d75b1b.svg?n=microsoft_account_logo_color.svg" alt="Card image cap">
+                  <div class="card-body">
+                    <h4 class="card-title">{{favorite.websiteName}}</h4>
+                    <a [href]="favorite.websiteURL"><p class="card-text">{{(favorite.websiteURL)? (favorite.websiteURL | slice:0:15)+'...':(favorite.websiteURL)}}</p></a>
+                  </div>
+                  <div class="card-footer">
+                    <button class="btn btn-primary" (click)="editFavorite(favorite)" ngbTooltip="Edit">
+                        <i  class="fa fa-pencil"></i>
+                      </button>
+                      <button class="btn btn-danger" (click)="openDelete(favorite, delete)" ngbTooltip="Delete">
+                          <i  class="fa fa-trash"></i>
+                        </button>
+                  </div>
+                  </ng-container>
+                  <ng-template #editFV>
+                      <div class="card-body">
+                        <h4 class="card-title"><input type="text" name="websiteName" id="websiteName" (keypress)="submitFavorite($event, favorite)" [(ngModel)]="favorite.websiteName" placeholder="WebsiteName" class="form-control"></h4>
+                          <p class="card-text"><input type="text" type="url" name="WebsiteURL" id="WebsiteURL" (keypress)="submitFavorite($event, favorite)" [(ngModel)]="favorite.websiteURL" placeholder="WebsiteURL" class="form-control">
+                          </p>
+                      </div>
+                      <div class="card-footer">
+                        <button class="btn btn-success" (click)="editFavorite(favorite)">Save</button>
+                        <button class="btn btn-primary" (click)="cancelEditFavorite()">Cancel</button>
+                    </div>
+                  </ng-template>
+            </div>
+        </div>
+      </div>
+
+      <div class="no-favorites" *ngIf="favoritesList?.length == 0">
+          No Favorites websites found.
+      </div>
+      <div class="col-md-2">  
+      </div>
+    </div>
+    </div>
+    <ng-template #content let-c="close" let-d="dismiss">
+    <form (ngSubmit)="onSubmit()" #addForm="ngForm">
+        <div class="modal-header justify-content-md-center">
+          <h4 class="modal-title ml-auto">Add New Favorite Website</h4>
+          <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        
+        <div class="modal-body text-center">
+              <div class="form-row justify-content-md-center mb-3">
+                <div class="col-md-5">
+                  <input type="text" name="websiteName" id="websiteName" [(ngModel)]="newFavorite.websiteName" placeholder="Website Name" class="form-control" required minlength="1" #websiteName="ngModel">
+                  <div *ngIf="websiteName.invalid  && (websiteName.dirty || websiteName.touched)" class="alert alert-danger">
+                      <div [hidden]="!websiteName.errors.required">
+                        Website name is required!
+                      </div>
+                      <div [hidden]="!websiteName.errors.minlength">
+                          Website name must be at least 2 characters long.
+                      </div>
+                    </div>
+                </div>
+              </div>
+              <div class="form-row justify-content-md-center">
+                <div class="col-md-5">
+                  <input name="websiteURL" type="url" id="websiteURL" [(ngModel)]="newFavorite.websiteURL" placeholder="Website URL" class="form-control" required minlength="2" #websiteURL="ngModel">
+                  <div *ngIf="websiteURL.invalid  && (websiteURL.dirty || websiteURL.touched)" class="alert alert-danger">
+                      <div [hidden]="!websiteURL.errors.required">
+                        Website URL is required!
+                      </div>
+                      <div [hidden]="!websiteURL.errors.minlength">
+                          Website URL must be at least 2 characters long.
+                      </div>
+                    </div>
+                </div>
+              </div>
+        </div>
+        <div class="modal-footer">
+          <button [disabled]="!addForm.form.valid" type="submit" class="btn btn-primary" (click)="create()">Add</button>
+        </div>
+      </form>
+    </ng-template>
+    
+    <ng-template #delete let-c="close" let-d="dismiss">
+        <div class="modal-header justify-content-md-center">
+          <h4 class="modal-title ml-auto">Delete Favorite Website</h4>
+          <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body text-center">
+          <div class="row justify-content-md-center mb-3">
+            <div class="col-md-5">
+              <p name="websiteName" id="websiteName" class="text-bold">{{deletedFavorite.websiteName}}</p>
+            </div>
+          </div>
+          <div class="row justify-content-md-center">
+            <div class="col-md-5">
+              <p id="websiteURL">{{deletedFavorite.websiteURL}}</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger" (click)="deleteFavorite(deletedFavorite)">Delete</button>
+        </div>
+    </ng-template>
